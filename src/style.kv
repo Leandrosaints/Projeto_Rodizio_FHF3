@@ -1,0 +1,56 @@
+
+<BoxLayout>:
+    orientation:'vertical'
+    spacing: '1dp'
+    padding: 0, 100, 0, 0
+
+
+
+<MyBoxLayout>:
+
+    orientation: 'vertical'
+    spacing: '10dp'
+    padding: '10dp'
+
+
+    canvas.before:
+        Color:
+            rgba: 0.2, 0.2, 0.8, 1
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [20, 20, 0, 0]
+
+
+
+
+
+<GridLayout>:
+    canvas.before:
+        Color:
+            rgba: 0.2, 0.2, 0.1, 1
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [20, 20, 0, 0]
+    MDLabel:
+        id:person_label
+        text: "Texto com tamanho personalizado"
+        halign: 'center'
+        theme_text_color: "Primary"
+        font_size: "24sp"
+
+
+
+
+
+
+
+MDLabel:
+        text: "FHF 3"
+        halign: "center"
+        font_style: "H3"
+        theme_text_color: "Custom"
+        text_color: 1, 1, 1, 1  # Cor branca em RGBA
+        size_hint_y: None
+        height: dp(56)

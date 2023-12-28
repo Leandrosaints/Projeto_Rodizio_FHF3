@@ -1,0 +1,27 @@
+<BoxLayout>:
+    orientation: 'vertical'
+
+    height: self.minimum_height
+    padding: 0, 130, 0, 0
+    spacing: dp(32)
+
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1  # Cor azul em RGBA
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [0, 0, 0, 0]
+
+
+<MyBoxLayout>:
+    orientation: 'vertical'
+    padding: dp(24)
+    spacing: dp(16)
+    canvas.before:
+        Color:
+            rgba: 0.1, 0.8, 0.5, 1  # Cor branca em RGBA
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [20, 20, 0, 0]
