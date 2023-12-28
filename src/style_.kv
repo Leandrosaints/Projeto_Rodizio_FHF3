@@ -8,7 +8,7 @@
 
     canvas.before:
         Color:
-            rgba:  get_color_from_hex("#2775f5")
+            rgba:  get_color_from_hex("#3200d7")# cor de fundo do Main principal
         RoundedRectangle:
             size: self.size
             pos: self.pos
@@ -21,20 +21,25 @@
     spacing: dp(16)
     canvas.before:
         Color:
-            rgba: 1, 1, 1,  1  # Cor branca em RGBA
+            rgba: get_color_from_hex("#f0f0f0")#cor de fundo do widget secundary
         RoundedRectangle:
             size: self.size
             pos: self.pos
             radius: [0, 50, 0, 0]
+
+
 <MyLabel>:
 
     padding:10, 0, 0, 0
     size_hint:(None, None)
     canvas.before:
         Color:
-            rgba: 1, 1, 1,  1 #get_color_from_hex("#f0f0f0") #if self.id != 'person_label' else get_color_from_hex("#3140B6") # Cor de fundo desejada
+            rgba: get_color_from_hex("#f0f0f0") #if self.id != 'person_label' else get_color_from_hex("#3140B6") # Cor de fundo desejada
         RoundedRectangle:
             size: self.size
             pos: self.pos
             radius: [0, 0, 0, 0]
+
+
+
 
