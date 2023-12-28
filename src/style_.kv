@@ -1,3 +1,4 @@
+#:import get_color_from_hex kivy.utils.get_color_from_hex
 <BoxLayout>:
     orientation: 'vertical'
 
@@ -7,7 +8,7 @@
 
     canvas.before:
         Color:
-            rgba: 1, 1, 1, 1  # Cor azul em RGBA
+            rgba:  get_color_from_hex("#2775f5")
         RoundedRectangle:
             size: self.size
             pos: self.pos
@@ -20,8 +21,20 @@
     spacing: dp(16)
     canvas.before:
         Color:
-            rgba: 0.1, 0.8, 0.5, 1  # Cor branca em RGBA
+            rgba: 1, 1, 1,  1  # Cor branca em RGBA
         RoundedRectangle:
             size: self.size
             pos: self.pos
-            radius: [20, 20, 0, 0]
+            radius: [0, 50, 0, 0]
+<MyLabel>:
+
+    padding:10, 0, 0, 0
+    size_hint:(None, None)
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1,  1 #get_color_from_hex("#f0f0f0") #if self.id != 'person_label' else get_color_from_hex("#3140B6") # Cor de fundo desejada
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [0, 0, 0, 0]
+
