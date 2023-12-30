@@ -1,18 +1,25 @@
 #:import get_color_from_hex kivy.utils.get_color_from_hex
-<BoxLayout>:
-    orientation: 'vertical'
+<MDBoxLayout>:
 
+    orientation: 'vertical'
+    id: root.self.id
     height: self.minimum_height
     padding: 0, 130, 0, 0
     spacing: dp(32)
 
     canvas.before:
+
+
+
         Color:
-            rgba:  get_color_from_hex("#3200d7")# cor de fundo do Main principal
-        RoundedRectangle:
+            rgba:  get_color_from_hex("#4a42ad")# cor de fundo do Main principal
+        Rectangle:
+
             size: self.size
             pos: self.pos
-            radius: [0, 0, 0, 0]
+            #radius: [0, 0, 0, 0]
+            source: 'src/img/pin.jpg'
+
 
 
 <MyBoxLayout>:
@@ -25,7 +32,19 @@
         RoundedRectangle:
             size: self.size
             pos: self.pos
-            radius: [0, 50, 0, 0]
+            radius: [30, 30, 0, 0]
+<Search>
+
+    hint_text: "Pesquisar"
+    size_hint:(None, None)
+    size: 250, 32
+    mode: "round"
+
+    line_color_normal: 1, 1, 1, 1
+    line_color_focus: 1, 1, 1, 1
+    background_color:10, 10, 20, 0
+
+
 
 
 <MyLabel>:
@@ -39,6 +58,13 @@
             size: self.size
             pos: self.pos
             radius: [0, 0, 0, 0]
+
+
+
+
+
+
+
 
 
 
