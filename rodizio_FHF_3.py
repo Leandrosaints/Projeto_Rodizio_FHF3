@@ -4,16 +4,17 @@ import random
 from colorama import Fore
 class Logic():
     def __init__(self):
-        ...
+        #self.todas_funcoes = []
+        self.logic()
     def logic(self):
 
         pessoas = ['Petrianne', 'M.Eduarda', 'Shirlene', 'Marilene', 'Alberta', 'Patricia', 'Lenilza', 'Ana']
 
         # Lista de funções numeradas
-        funcoes = [2, 8, 9, 10, 12, 13, 20]
+        self.funcoes = [2, 8, 9, 12, 13, 20]
 
         # Dicionário para armazenar as funções atribuídas a cada pessoa
-        funcoes_pessoas = {}
+        self.funcoes_pessoas = {}
 
         # Funções consideradas pesadas
         funcoes_pesadas = [8, 13, 20]
@@ -23,7 +24,7 @@ class Logic():
 
         # Distribuir funções adicionais para cada pessoa
         for i, pessoa in enumerate(pessoas):
-            funcoes_disponiveis = funcoes.copy()
+            funcoes_disponiveis = self.funcoes.copy()
             funcoes_atribuidas = [funcoes_predefinidas[i]]#Recebe as fucoes que ja foram pre-definidas respectivamente
 
             while len(funcoes_atribuidas) < 4:
@@ -44,13 +45,15 @@ class Logic():
                     funcoes_atribuidas.append(funcao)
 
                 funcoes_disponiveis.remove(funcao)
-            funcoes_pessoas[pessoa] = funcoes_atribuidas
+            self.funcoes_pessoas[pessoa] = funcoes_atribuidas
 
+            #return funcoes_pessoas[pessoa]
 
-        return funcoes_pessoas.items()
-
+        #return funcoes_pessoas.items()
                 # Exibir as funções atribuídas a cada pessoa
         #for pessoa, funcoes in funcoes_pessoas.items():
-            #return funcoes
-            #print(f"{pessoa}:{funcoes[0]}")
+            #self.todas_funcoes.append(funcoes)
+
+            #print(f"{pessoa}:{funcoes}")
+
 
