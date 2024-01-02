@@ -45,7 +45,7 @@ class Logic():
                     funcoes_atribuidas.append(funcao)
 
                 funcoes_disponiveis.remove(funcao)
-            self.funcoes_pessoas[pessoa] = funcoes_atribuidas
+            self.funcoes_pessoas[i] = funcoes_atribuidas
 
             #return funcoes_pessoas[pessoa]
 
