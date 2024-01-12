@@ -132,18 +132,132 @@ class MyBoxLayout(MDBoxLayout):
 class Scroll(ScrollView):
     ...
 
+    # ... (seu código anterior)
+
+    class CardScreen(Screen):
+        def __init__(self, main_app, card_number, **kwargs):
+            super(CardScreen, self).__init__(name=f'Card_{card_number}', **kwargs)
+            self.main_app = main_app
+
+            # Crie uma instância de MDCard
+            card = MDCard(
+                orientation='vertical',
+                padding=10,
+                size_hint=(None, None),
+                size=(300, 400),
+            )
+
+            # Adicione um ScrollView na vertical
+            side_scroll = ScrollView(
+                size_hint=(None, None),
+                size=(300, 400),
+                scroll_y=True,
+                scroll_x=False,
+            )
+
+            # Adicione o MDGridLayout ao ScrollView
+            self.people_functions_layout = MDGridLayout(cols=6, size_hint_y=None)
+            self.people_functions_layout.bind(minimum_height=self.people_functions_layout.setter('height'))
+
+            for i, nome in enumerate(main_app.my_data.people_list):
+                item = MyLabel(
+                    main_app=main_app,
+                    text=nome,
+                    size_hint=(None, 0.1),
+                    size=[110, 1],
+                )
+                self.people_functions_layout.add_widget(item)
+
+                for func in main_app.logic_instance.funcoes_pessoas[i]:
+                    function_label = MyLabel(
+                        text=str(func),
+                        main_app=main_app,
+                        id='function_label',
+                        size_hint=(0.1, 0.1),
+                        height="40"
+                    )
+                    self.people_functions_layout.add_widget(function_label)
+
+                edit_button = MDIconButton(
+                    icon="pencil",
+                    id='edit_button',
+                )
+                self.people_functions_layout.add_widget(edit_button)
+
+            # Adicione o MDGridLayout ao ScrollView
+            side_scroll.add_widget(self.people_functions_layout)
+
+            # Adicione o ScrollView ao MDCard
+            card.add_widget(side_scroll)
+
+            # Adicione o MDCard à tela
+            self.add_widget(card)
+
+        # Restante do código...
+
+    # Restante do código...
+    # ... (seu código anterior)
+
 class CardScreen(Screen):
     def __init__(self, main_app, card_number, **kwargs):
         super(CardScreen, self).__init__(name=f'Card_{card_number}', **kwargs)
         self.main_app = main_app
+
+        # Crie uma instância de MDCard
         card = MDCard(
             orientation='vertical',
             padding=10,
             size_hint=(None, None),
-            size=(300, 200),
+            size=(300, 420),
         )
-        card.add_widget(MDLabel(text=f'Conteúdo do Cartão {card_number}'))
+
+        # Adicione um ScrollView na vertical
+        side_scroll = ScrollView(
+            size_hint=(None, None),
+            size=(300, 350),
+        )
+
+        # Adicione o MDGridLayout ao ScrollView
+        self.people_functions_layout = MDGridLayout(cols=6, size_hint_y=None)
+        self.people_functions_layout.bind(minimum_height=self.people_functions_layout.setter('height'))
+
+        for i, nome in enumerate(main_app.my_data.people_list):
+            item = MyLabel(
+                main_app=main_app,
+                text=nome,
+                size_hint=(None, 0.1),
+                size=[110, 1],
+            )
+            self.people_functions_layout.add_widget(item)
+
+            for func in main_app.logic_instance.funcoes_pessoas[i]:
+                function_label = MyLabel(
+                    text=str(func),
+                    main_app=main_app,
+                    id='function_label',
+                    size_hint=(0.1, 0.1),
+                    height="40"
+                )
+                self.people_functions_layout.add_widget(function_label)
+
+            edit_button = MDIconButton(
+                icon="pencil",
+                id='edit_button',
+            )
+            self.people_functions_layout.add_widget(edit_button)
+
+        # Adicione o MDGridLayout ao ScrollView
+        side_scroll.add_widget(self.people_functions_layout)
+
+        # Adicione o ScrollView ao MDCard
+        card.add_widget(side_scroll)
+
+        # Adicione o MDCard à tela
         self.add_widget(card)
+
+    # Restante do código...
+
+# Restante do código...
 
     def on_touch_move(self, touch):
         # Verifica se o movimento é horizontal
@@ -174,16 +288,43 @@ class CardScreen(Screen):
 
 class MainApp(MDApp):
     def build(self):
+        self.my_data = MyData()
+        ######  Layout  #####
         Main = MDBoxLayout()
-
+        self.logic_instance = Logic()
+        self.Main_secundary = MyBoxLayout()
         self.screen_manager = ScreenManager()
+
+        ##### add hearde_label #####
+        header_label = MDLabel(
+            text='Rodizio FHF 3',
+            id='header_label',
+            halign='center',
+            size_hint=(1, None),
+            height='2',
+            padding=[0, 0, 0, 0]
+        )
+        self.search_field = Search(halign="center", pos_hint={"center_x": 0.5, "center_y": 0.5})
+
+
+
+        #############################################################
+
+        ############################################################
+
+        ######## Cards ########
 
         # Adiciona três instâncias de telas (cada uma com um card)
         for card_number in range(1, 4):
             screen = CardScreen(self, card_number=card_number)
             self.screen_manager.add_widget(screen)
 
-        Main.add_widget(self.screen_manager)
+        ##### Add os cards a Main secundary e principal######
+        Main.add_widget(header_label)
+        Main.add_widget(self.search_field)
+        self.Main_secundary.add_widget(self.screen_manager)
+        Main.add_widget(self.Main_secundary)
+
         return Main
 
     """def update_people_functions_layout(self,  chave=None):
@@ -220,9 +361,6 @@ class MainApp(MDApp):
 
                 self.people_functions_layout.add_widget(edit_button)
 """
-
-
-
 
 
 if __name__ == '__main__':
