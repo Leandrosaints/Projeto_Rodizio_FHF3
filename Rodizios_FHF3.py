@@ -1,8 +1,12 @@
 import cProfile
 
-from kivy.clock import Clock
+from kivy.uix.screenmanager import SlideTransition
+from kivymd.uix.screen import Screen
+from kivymd.uix.screenmanager import ScreenManager
+
 from kivymd.app import MDApp
 from kivymd.uix.boxlayout import BoxLayout, MDBoxLayout
+from kivymd.uix.card import MDCard
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.gridlayout import MDGridLayout
 from kivymd.uix.label import MDLabel
@@ -67,7 +71,7 @@ class Dialog(MDDialog):
                     valor_antigo)
                 self.main_app.logic_instance.funcoes_pessoas[chave_associada][index_sublista] = novo_valor
                 self.main_app.update_people_functions_layout(chave)
-                break
+
             # Substitui o valor na sub-lista
             #self.main_app.logic_instance.funcoes_pessoas[chave][index_sublista] = novo_valor
 
@@ -126,67 +130,63 @@ class MyBoxLayout(MDBoxLayout):
     adaptive_width = True
 
 class Scroll(ScrollView):
-    adaptive_width = True
+    ...
+
+class CardScreen(Screen):
+    def __init__(self, main_app, card_number, **kwargs):
+        super(CardScreen, self).__init__(name=f'Card_{card_number}', **kwargs)
+        self.main_app = main_app
+        card = MDCard(
+            orientation='vertical',
+            padding=10,
+            size_hint=(None, None),
+            size=(300, 200),
+        )
+        card.add_widget(MDLabel(text=f'Conteúdo do Cartão {card_number}'))
+        self.add_widget(card)
+
+    def on_touch_move(self, touch):
+        # Verifica se o movimento é horizontal
+        if abs(touch.dx) > abs(touch.dy):
+            # Desloca para a esquerda
+            app = self.main_app.get_running_app()
+            if touch.dx < -20:
+                #app = self.main_app.get_running_app()
+                screen_manager = app.screen_manager
+                next_card_number = int(self.name.split('_')[1]) + 1
+                next_card_name = f'Card_{next_card_number}'
+                if screen_manager.has_screen(next_card_name):
+                    screen_manager.current = next_card_name
+                    return True
+            # Desloca para a direita (pode adicionar lógica semelhante para deslocar para a tela anterior)
+            elif touch.dx > 20:
+                prev_card_number = int(self.name.split('_')[1]) - 1
+                prev_card_name = f'Card_{prev_card_number}'
+                if prev_card_number >= 1 and app.screen_manager.has_screen(prev_card_name):
+                    # Change the transition to SlideTransition
+                    app.screen_manager.transition = SlideTransition(direction='right')
+                    app.screen_manager.current = prev_card_name
+                    return True
+
+                # Reset the transition to the default
+            app.screen_manager.transition = SlideTransition(direction='left')
+            return super(CardScreen, self).on_touch_move(touch)
 
 class MainApp(MDApp):
     def build(self):
-        sideScroll = Scroll()
         Main = MDBoxLayout()
-        self.my_data = MyData()
-        self.logic_instance = Logic()
-        header_label = MDLabel(
-            text='Rodizio FHF 3',
-            id='header_label',
-            halign='center',
-            size_hint=(1, None),
-            height='2',
-            padding=[0, 0, 0, 0]
-        )
-        self.search_field = Search(halign="center", pos_hint={"center_x": 0.5, "center_y": 0.5})
 
-        Main.add_widget(header_label)
-        Main.add_widget(self.search_field)
+        self.screen_manager = ScreenManager()
 
-        Main_secundary = MyBoxLayout()
+        # Adiciona três instâncias de telas (cada uma com um card)
+        for card_number in range(1, 4):
+            screen = CardScreen(self, card_number=card_number)
+            self.screen_manager.add_widget(screen)
 
-        #self.functions_list = ['2', '8', '9', '10']
-        #todas_funcoes = self.logic_instance.todas_funcoes
-        self.people_functions_layout = MDGridLayout(cols=6)#len(self.logic_instance.funcoes) -2)
-        for i, nome in enumerate(self.my_data.people_list):
-
-
-            item = MyLabel(
-                main_app=self,
-                text=nome,
-                size_hint=(None, 0.1),
-                size=[110, 1],
-
-            )
-            self.people_functions_layout.add_widget(item)
-
-            for func in self.logic_instance.funcoes_pessoas[i]:
-                function_label = MyLabel(
-                    text=str(func),
-                    main_app=self,
-                    id='function_label',
-                    size_hint=(0.1, 0.1),
-                    height="40"
-                )
-                self.people_functions_layout.add_widget(function_label)
-            edit_button = MDIconButton(
-                icon="pencil",
-                id='edit_button',
-            )
-
-            self.people_functions_layout.add_widget(edit_button)
-        sideScroll.add_widget(self.people_functions_layout)
-        Main_secundary.add_widget(sideScroll)
-        Main.add_widget(Main_secundary)
-
+        Main.add_widget(self.screen_manager)
         return Main
 
-
-    def update_people_functions_layout(self,  chave=None):
+    """def update_people_functions_layout(self,  chave=None):
         Clock.schedule_once(lambda dt: self._update_people_functions_layout(chave), 0)
 
 
@@ -219,7 +219,7 @@ class MainApp(MDApp):
                 )
 
                 self.people_functions_layout.add_widget(edit_button)
-
+"""
 
 
 

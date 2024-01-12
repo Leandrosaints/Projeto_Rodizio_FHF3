@@ -8,7 +8,7 @@ class Logic():
         self.logic()
     def logic(self):
 
-        pessoas = ['Petrianne', 'M.Eduarda', 'Shirlene', 'Marilene', 'Alberta', 'Patricia', 'Lenilza', 'Ana']
+        self.pessoas = ['Petrianne','leandro','lucas','maria','isac','higor', 'M.Eduarda', 'Shirlene', 'Marilene', 'Alberta', 'Patricia', 'Lenilza', 'Ana']
 
         # Lista de funções numeradas
         self.funcoes = [2, 8, 9, 12, 13, 20]
@@ -20,10 +20,10 @@ class Logic():
         funcoes_pesadas = [8, 13, 20]
 
         # Funções predefinidas para cada pessoa
-        funcoes_predefinidas = [8, 8, 9, 12, 13, 20, 9, 2]
+        funcoes_predefinidas = [8, 8, 9, 12, 13, 20, 9, 2, 1, 2, 3, 4, 5]
 
         # Distribuir funções adicionais para cada pessoa
-        for i, pessoa in enumerate(pessoas):
+        for i, pessoa in enumerate(self.pessoas):
             funcoes_disponiveis = self.funcoes.copy()
             funcoes_atribuidas = [funcoes_predefinidas[i]]#Recebe as fucoes que ja foram pre-definidas respectivamente
 
