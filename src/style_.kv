@@ -6,7 +6,7 @@
     id: root.self.id
     height: self.minimum_height
     padding: 0, 130, 0, 0
-    spacing: dp(32)
+    spacing: dp(20)
 
     canvas.before:
         Color:
@@ -15,12 +15,45 @@
 
             size: self.size
             pos: self.pos
-            #radius: [0, 0, 0, 0]
-            source: 'src/img/pin.jpg'
+            #radius: [20, 0, 20, 0]
 
 
+            source: 'src/img/brf.png'
+
+
+
+
+<MDCard>:
+    card_number: root.card_number
+
+    orientation:'vertical'
+    padding:50
+    radius:[20, 20, 20, 20]
+    size_hint: None, None
+    size:(280, 350)
+    #pos_hint: {"center_x": 0.5, "center_y": 0.4}
+    md_bg_color: get_color_from_hex("#417ef5")
+
+
+    canvas.before:
+        Color:
+            #sempre o ultimo card
+            rgba: get_color_from_hex("#ced9f5") if (self.card_number == 1  ) else (0, 0, 0, 0)
+
+
+        RoundedRectangle:
+            pos: self.pos[0] + 5, self.pos[1] +50
+            size:(300, 230)
+            radius: [0, 30, 30, 0]
+        Color:
+            rgba: (0, 0, 0, 0) if self.card_number == 3 else get_color_from_hex("#b7c8f4") #if (self.card_number == 1 ) else (0, 0, 0, 0)
+        RoundedRectangle:
+            pos: self.pos[0] + 5, self.pos[1] +30  # Ajuste conforme necessário
+            size:(290, 290)
+            radius: [0, 30, 30, 0]
 
 <MyBoxLayout>:
+
     orientation: 'vertical'
     padding: dp(24)
     spacing: dp(16)
@@ -31,6 +64,13 @@
             size: self.size
             pos: self.pos
             radius: [30, 30, 0, 0]
+
+
+
+
+
+
+
 <Search>
 
     hint_text: "Pesquisar"
@@ -40,7 +80,7 @@
 
     line_color_normal: 1, 1, 1, 1
     line_color_focus: 1, 1, 1, 1
-    background_color:10, 10, 20, 0
+    background_color:10, 0, 10, 0
 
 
 
@@ -56,8 +96,6 @@
             size: self.size
             pos: self.pos
             radius: [0, 0, 0, 0]
-
-
 
 
 

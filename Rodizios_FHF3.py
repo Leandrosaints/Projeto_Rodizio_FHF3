@@ -1,6 +1,10 @@
 import cProfile
 
+from kivy.graphics import Color, Rectangle
+from kivy.metrics import dp
+from kivy.uix.label import Label
 from kivy.uix.screenmanager import SlideTransition
+from kivymd.theming import ThemeManager
 from kivymd.uix.screen import Screen
 from kivymd.uix.screenmanager import ScreenManager
 
@@ -17,7 +21,8 @@ from kivymd.uix.textfield import MDTextField
 from rodizio_FHF_3 import Logic
 Builder.load_file('src/style_.kv')
 
-from kivy.properties import ListProperty
+from kivy.properties import ListProperty, DictProperty
+
 
 class MyData(BoxLayout):
     people_list = ListProperty(['Petrianne', 'M.Eduarda', 'Shirlene', 'Marilene', 'Alberta', 'Patricia',
@@ -127,14 +132,14 @@ class Search(MDTextField):
     pass
 
 class MyBoxLayout(MDBoxLayout):
-    adaptive_width = True
+   ...
 
 class Scroll(ScrollView):
     ...
 
     # ... (seu código anterior)
 
-    class CardScreen(Screen):
+    """class CardScreen(Screen):
         def __init__(self, main_app, card_number, **kwargs):
             super(CardScreen, self).__init__(name=f'Card_{card_number}', **kwargs)
             self.main_app = main_app
@@ -185,10 +190,10 @@ class Scroll(ScrollView):
                 self.people_functions_layout.add_widget(edit_button)
 
             # Adicione o MDGridLayout ao ScrollView
-            side_scroll.add_widget(self.people_functions_layout)
+            #side_scroll.add_widget(self.people_functions_layout)
 
             # Adicione o ScrollView ao MDCard
-            card.add_widget(side_scroll)
+            #card.add_widget(side_scroll)
 
             # Adicione o MDCard à tela
             self.add_widget(card)
@@ -196,20 +201,23 @@ class Scroll(ScrollView):
         # Restante do código...
 
     # Restante do código...
-    # ... (seu código anterior)
-
+    # ... (seu código anterior)"""
+class MyMDCard(MDCard):
+    def __init__(self, card_number, **kwargs):
+        super(MyMDCard, self).__init__(**kwargs)
+        self.card_number = card_number
 class CardScreen(Screen):
     def __init__(self, main_app, card_number, **kwargs):
         super(CardScreen, self).__init__(name=f'Card_{card_number}', **kwargs)
         self.main_app = main_app
+        self.card_number = card_number
+        """with self.canvas.before:
+            Color(1, 0, 0, 1)  # Cor da sombra (vermelho puro para demonstração)
+            self.shadow_rectangle = Rectangle(pos=self.pos, size=self.size)"""
 
         # Crie uma instância de MDCard
-        card = MDCard(
-            orientation='vertical',
-            padding=10,
-            size_hint=(None, None),
-            size=(300, 420),
-        )
+        self.card = MyMDCard(self.card_number)
+
 
         # Adicione um ScrollView na vertical
         side_scroll = ScrollView(
@@ -218,7 +226,7 @@ class CardScreen(Screen):
         )
 
         # Adicione o MDGridLayout ao ScrollView
-        self.people_functions_layout = MDGridLayout(cols=6, size_hint_y=None)
+        """self.people_functions_layout = MDGridLayout(cols=6, size_hint_y=None)
         self.people_functions_layout.bind(minimum_height=self.people_functions_layout.setter('height'))
 
         for i, nome in enumerate(main_app.my_data.people_list):
@@ -226,7 +234,7 @@ class CardScreen(Screen):
                 main_app=main_app,
                 text=nome,
                 size_hint=(None, 0.1),
-                size=[110, 1],
+                size=[100, 1],
             )
             self.people_functions_layout.add_widget(item)
 
@@ -250,15 +258,21 @@ class CardScreen(Screen):
         side_scroll.add_widget(self.people_functions_layout)
 
         # Adicione o ScrollView ao MDCard
-        card.add_widget(side_scroll)
+        card.add_widget(side_scroll)"""
 
         # Adicione o MDCard à tela
-        self.add_widget(card)
+        self.add_widget(self.card)
 
     # Restante do código...
 
 # Restante do código...
+    def update_card_number(self, card_number):
+        self.card_number = card_number
+        print(self.card_number)
 
+        #card_screen = self.main_app.screen_manager.get_screen(self.name)
+        #card_screen.card_number = card_number
+        #card_screen.ids.card_id.card_number = card_number  # Atualiza também usando o ID do MDCard
     def on_touch_move(self, touch):
         # Verifica se o movimento é horizontal
         if abs(touch.dx) > abs(touch.dy):
@@ -269,8 +283,12 @@ class CardScreen(Screen):
                 screen_manager = app.screen_manager
                 next_card_number = int(self.name.split('_')[1]) + 1
                 next_card_name = f'Card_{next_card_number}'
+
                 if screen_manager.has_screen(next_card_name):
                     screen_manager.current = next_card_name
+                    self.update_card_number(next_card_number)
+
+
                     return True
             # Desloca para a direita (pode adicionar lógica semelhante para deslocar para a tela anterior)
             elif touch.dx > 20:
@@ -280,6 +298,7 @@ class CardScreen(Screen):
                     # Change the transition to SlideTransition
                     app.screen_manager.transition = SlideTransition(direction='right')
                     app.screen_manager.current = prev_card_name
+                    self.update_card_number(prev_card_number)
                     return True
 
                 # Reset the transition to the default
@@ -291,37 +310,57 @@ class MainApp(MDApp):
         self.my_data = MyData()
         ######  Layout  #####
         Main = MDBoxLayout()
-        self.logic_instance = Logic()
+
+
+        #self.logic_instance = Logic()
         self.Main_secundary = MyBoxLayout()
         self.screen_manager = ScreenManager()
 
         ##### add hearde_label #####
+        #self.theme_cls = ThemeManager()
+        #self.theme_cls.theme_style = "Light"  # Ou "Light" conforme necessário
+
         header_label = MDLabel(
             text='Rodizio FHF 3',
-            id='header_label',
-            halign='center',
+            theme_text_color='Custom',
+            text_color="white",# Use 'Custom' para personalizar a cor do texto
+            halign='right',
+            bold=True,
+            height=dp(10),
+            font_style= "H5",  # Estilo da fonte (pode ser "Subtitle1", "Body1", "H1", etc.)
+            font_name="src/fontes/Lato/Lato-LightItalic.ttf",
             size_hint=(1, None),
-            height='2',
-            padding=[0, 0, 0, 0]
+            padding=[0, 0, 20, 0],
+
+
         )
-        self.search_field = Search(halign="center", pos_hint={"center_x": 0.5, "center_y": 0.5})
+        date_label = MDLabel(
+            text='seg - 14/01/2024',
+            theme_text_color='Custom',
+            text_color="white",
+            size_hint=(1, None),
+            halign='right',
+            height=dp(3),
+            padding=[0,0,20,0],
 
 
-
-        #############################################################
-
-        ############################################################
+        )
+        self.search_field = Search(halign="center", pos_hint={"center_x": 0.4, "top":0.5})
 
         ######## Cards ########
+
 
         # Adiciona três instâncias de telas (cada uma com um card)
         for card_number in range(1, 4):
             screen = CardScreen(self, card_number=card_number)
             self.screen_manager.add_widget(screen)
 
+
         ##### Add os cards a Main secundary e principal######
-        Main.add_widget(header_label)
         Main.add_widget(self.search_field)
+        Main.add_widget(header_label)
+        Main.add_widget(date_label)
+
         self.Main_secundary.add_widget(self.screen_manager)
         Main.add_widget(self.Main_secundary)
 
