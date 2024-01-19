@@ -139,74 +139,16 @@ class Scroll(ScrollView):
 
     # ... (seu código anterior)
 
-    """class CardScreen(Screen):
-        def __init__(self, main_app, card_number, **kwargs):
-            super(CardScreen, self).__init__(name=f'Card_{card_number}', **kwargs)
-            self.main_app = main_app
 
-            # Crie uma instância de MDCard
-            card = MDCard(
-                orientation='vertical',
-                padding=10,
-                size_hint=(None, None),
-                size=(300, 400),
-            )
 
-            # Adicione um ScrollView na vertical
-            side_scroll = ScrollView(
-                size_hint=(None, None),
-                size=(300, 400),
-                scroll_y=True,
-                scroll_x=False,
-            )
 
-            # Adicione o MDGridLayout ao ScrollView
-            self.people_functions_layout = MDGridLayout(cols=6, size_hint_y=None)
-            self.people_functions_layout.bind(minimum_height=self.people_functions_layout.setter('height'))
-
-            for i, nome in enumerate(main_app.my_data.people_list):
-                item = MyLabel(
-                    main_app=main_app,
-                    text=nome,
-                    size_hint=(None, 0.1),
-                    size=[110, 1],
-                )
-                self.people_functions_layout.add_widget(item)
-
-                for func in main_app.logic_instance.funcoes_pessoas[i]:
-                    function_label = MyLabel(
-                        text=str(func),
-                        main_app=main_app,
-                        id='function_label',
-                        size_hint=(0.1, 0.1),
-                        height="40"
-                    )
-                    self.people_functions_layout.add_widget(function_label)
-
-                edit_button = MDIconButton(
-                    icon="pencil",
-                    id='edit_button',
-                )
-                self.people_functions_layout.add_widget(edit_button)
-
-            # Adicione o MDGridLayout ao ScrollView
-            #side_scroll.add_widget(self.people_functions_layout)
-
-            # Adicione o ScrollView ao MDCard
-            #card.add_widget(side_scroll)
-
-            # Adicione o MDCard à tela
-            self.add_widget(card)
-
-        # Restante do código...
-
-    # Restante do código...
-    # ... (seu código anterior)"""
 class MyMDCard(MDCard):
+
     def __init__(self, card_number, **kwargs):
         super(MyMDCard, self).__init__(**kwargs)
         self.card_number = card_number
 class CardScreen(Screen):
+
     def __init__(self, main_app, card_number, **kwargs):
         super(CardScreen, self).__init__(name=f'Card_{card_number}', **kwargs)
         self.main_app = main_app
@@ -226,7 +168,7 @@ class CardScreen(Screen):
         )
 
         # Adicione o MDGridLayout ao ScrollView
-        """self.people_functions_layout = MDGridLayout(cols=6, size_hint_y=None)
+        self.people_functions_layout = MDGridLayout(cols=6, size_hint_y=None)
         self.people_functions_layout.bind(minimum_height=self.people_functions_layout.setter('height'))
 
         for i, nome in enumerate(main_app.my_data.people_list):
@@ -258,7 +200,7 @@ class CardScreen(Screen):
         side_scroll.add_widget(self.people_functions_layout)
 
         # Adicione o ScrollView ao MDCard
-        card.add_widget(side_scroll)"""
+        self.card.add_widget(side_scroll)
 
         # Adicione o MDCard à tela
         self.add_widget(self.card)
@@ -312,13 +254,13 @@ class MainApp(MDApp):
         Main = MDBoxLayout()
 
 
-        #self.logic_instance = Logic()
+        self.logic_instance = Logic()
         self.Main_secundary = MyBoxLayout()
         self.screen_manager = ScreenManager()
 
         ##### add hearde_label #####
-        #self.theme_cls = ThemeManager()
-        #self.theme_cls.theme_style = "Light"  # Ou "Light" conforme necessário
+        self.theme_cls = ThemeManager()
+        self.theme_cls.theme_style = "Light"  # Ou "Light" conforme necessário
 
         header_label = MDLabel(
             text='Rodizio FHF 3',
