@@ -1,5 +1,9 @@
-import cProfile
 
+import asyncio
+import os
+import threading
+
+from kivy.uix.image import Image
 from kivy.graphics import Color, Rectangle
 from kivy.metrics import dp
 from kivy.uix.label import Label
@@ -9,6 +13,7 @@ from kivymd.uix.screen import Screen
 from kivymd.uix.screenmanager import ScreenManager
 
 from kivymd.app import MDApp
+from kivy.core.window import Window
 from kivymd.uix.boxlayout import BoxLayout, MDBoxLayout
 from kivymd.uix.card import MDCard
 from kivymd.uix.dialog import MDDialog
@@ -19,15 +24,31 @@ from kivy.lang import Builder
 from kivy.uix.scrollview import ScrollView
 from kivymd.uix.textfield import MDTextField
 from rodizio_FHF_3 import Logic
+
 Builder.load_file('src/style_.kv')
 
-from kivy.properties import ListProperty, DictProperty
+from kivy.properties import ListProperty, DictProperty, NumericProperty, StringProperty
+from kivy.clock import Clock
+from kivy.uix.boxlayout import BoxLayout
 
+# from kivymd.uix.progressloader import MDProgressLoader
+
+from kivy.clock import Clock
+
+
+
+
+# Define a largura e altura desejadas
+
+class DataDados:
+    def __init__(self):
+        self.dados = Logic()
 
 class MyData(BoxLayout):
     people_list = ListProperty(['Petrianne', 'M.Eduarda', 'Shirlene', 'Marilene', 'Alberta', 'Patricia',
-               'Lenilza', 'Ana'])
+                                'Lenilza', 'Ana'])
     funcoes = ListProperty([2, 8, 9, 12, 13, 20])
+
 
 class Dialog(MDDialog):
     def __init__(self, text, main_app, **kwargs):
@@ -62,7 +83,7 @@ class Dialog(MDDialog):
 
             valor_antigo = int(self.text_label)
             novo_valor = int(self.text_field.text)
-            #index_sublista = lista_valores.index(valor_antigo)
+            # index_sublista = lista_valores.index(valor_antigo)
             # Obtém a chave associada ao valor antigo na lista de funções
             chave_associada = None
             for chave, lista_valores in self.main_app.logic_instance.funcoes_pessoas.items():
@@ -78,15 +99,13 @@ class Dialog(MDDialog):
                 self.main_app.update_people_functions_layout(chave)
 
             # Substitui o valor na sub-lista
-            #self.main_app.logic_instance.funcoes_pessoas[chave][index_sublista] = novo_valor
-
+            # self.main_app.logic_instance.funcoes_pessoas[chave][index_sublista] = novo_valor
 
             # Chama o método de substituição na classe MyLabel
-            #self.main_app.logic_instance.funcoes_pessoas[0][valor_antigo] = novo_valor
+            # self.main_app.logic_instance.funcoes_pessoas[0][valor_antigo] = novo_valor
             # self.main_app.logic_instance.funcoes_pessoas[0][2] = 9
-            #print(self.main_app.logic_instance.funcoes_pessoas)
+            # print(self.main_app.logic_instance.funcoes_pessoas)
         try:
-
 
             for i, nome in enumerate(self.my_list.people_list):
                 self.index_ = i
@@ -117,6 +136,7 @@ class Dialog(MDDialog):
         except:
             ...
 
+
 class MyLabel(MDLabel):
     def __init__(self, main_app, **kwargs):
         super(MyLabel, self).__init__(**kwargs)
@@ -128,51 +148,65 @@ class MyLabel(MDLabel):
         self.theme_text_color = "Secondary"
         self.caixa.open()
 
+
 class Search(MDTextField):
     pass
 
+
 class MyBoxLayout(MDBoxLayout):
-   ...
+    ...
+
 
 class Scroll(ScrollView):
     ...
 
     # ... (seu código anterior)
 
-    """class CardScreen(Screen):
-        def __init__(self, main_app, card_number, **kwargs):
-            super(CardScreen, self).__init__(name=f'Card_{card_number}', **kwargs)
-            self.main_app = main_app
 
-            # Crie uma instância de MDCard
-            card = MDCard(
-                orientation='vertical',
-                padding=10,
-                size_hint=(None, None),
-                size=(300, 400),
+class MyMDCard(MDCard):
+     # Exemplo de variável
+    def __init__(self, card_number, **kwargs):
+        super(MyMDCard, self).__init__(**kwargs)
+        self.card_number = card_number
+        self.var_width = Window.width
+        self.var_height = Window.height
+        self.size = (Window.width * 0.8, Window.height * 0.6)
+
+
+class CardScreen(Screen):
+
+    def __init__(self, main_app, card_number, **kwargs):
+        super(CardScreen, self).__init__(name=f'Card_{card_number}', **kwargs)
+        self.main_app = main_app
+        self.card_number = card_number
+
+        """with self.canvas.before:
+            Color(1, 0, 0, 1)  # Cor da sombra (vermelho puro para demonstração)
+            self.shadow_rectangle = Rectangle(pos=self.pos, size=self.size)"""
+
+        # Crie uma instância de MDCard
+        self.card = MyMDCard(self.card_number)
+
+        # Adicione um ScrollView na vertical
+        side_scroll = ScrollView(
+
+            size_hint=(None, None),
+            size=(Window.width * 0.9, Window.height * 0.8)
+        )
+
+        # Adicione o MDGridLayout ao ScrollView
+        self.people_functions_layout = MDGridLayout(cols=6, size_hint_y=None, padding=(10))
+        self.people_functions_layout.bind(minimum_height=self.people_functions_layout.setter('height'))
+
+        for i, nome in enumerate(main_app.my_data.people_list):
+            item = MyLabel(
+                main_app=main_app,
+                text=nome,
+                size_hint=(None, 0.1),
+                size=[100, 1],
             )
-
-            # Adicione um ScrollView na vertical
-            side_scroll = ScrollView(
-                size_hint=(None, None),
-                size=(300, 400),
-                scroll_y=True,
-                scroll_x=False,
-            )
-
-            # Adicione o MDGridLayout ao ScrollView
-            self.people_functions_layout = MDGridLayout(cols=6, size_hint_y=None)
-            self.people_functions_layout.bind(minimum_height=self.people_functions_layout.setter('height'))
-
-            for i, nome in enumerate(main_app.my_data.people_list):
-                item = MyLabel(
-                    main_app=main_app,
-                    text=nome,
-                    size_hint=(None, 0.1),
-                    size=[110, 1],
-                )
-                self.people_functions_layout.add_widget(item)
-
+            self.people_functions_layout.add_widget(item)
+            try:
                 for func in main_app.logic_instance.funcoes_pessoas[i]:
                     function_label = MyLabel(
                         text=str(func),
@@ -189,97 +223,36 @@ class Scroll(ScrollView):
                 )
                 self.people_functions_layout.add_widget(edit_button)
 
-            # Adicione o MDGridLayout ao ScrollView
-            #side_scroll.add_widget(self.people_functions_layout)
-
-            # Adicione o ScrollView ao MDCard
-            #card.add_widget(side_scroll)
-
-            # Adicione o MDCard à tela
-            self.add_widget(card)
-
-        # Restante do código...
-
-    # Restante do código...
-    # ... (seu código anterior)"""
-class MyMDCard(MDCard):
-    def __init__(self, card_number, **kwargs):
-        super(MyMDCard, self).__init__(**kwargs)
-        self.card_number = card_number
-class CardScreen(Screen):
-    def __init__(self, main_app, card_number, **kwargs):
-        super(CardScreen, self).__init__(name=f'Card_{card_number}', **kwargs)
-        self.main_app = main_app
-        self.card_number = card_number
-        """with self.canvas.before:
-            Color(1, 0, 0, 1)  # Cor da sombra (vermelho puro para demonstração)
-            self.shadow_rectangle = Rectangle(pos=self.pos, size=self.size)"""
-
-        # Crie uma instância de MDCard
-        self.card = MyMDCard(self.card_number)
-
-
-        # Adicione um ScrollView na vertical
-        side_scroll = ScrollView(
-            size_hint=(None, None),
-            size=(300, 350),
-        )
-
-        # Adicione o MDGridLayout ao ScrollView
-        """self.people_functions_layout = MDGridLayout(cols=6, size_hint_y=None)
-        self.people_functions_layout.bind(minimum_height=self.people_functions_layout.setter('height'))
-
-        for i, nome in enumerate(main_app.my_data.people_list):
-            item = MyLabel(
-                main_app=main_app,
-                text=nome,
-                size_hint=(None, 0.1),
-                size=[100, 1],
-            )
-            self.people_functions_layout.add_widget(item)
-
-            for func in main_app.logic_instance.funcoes_pessoas[i]:
-                function_label = MyLabel(
-                    text=str(func),
-                    main_app=main_app,
-                    id='function_label',
-                    size_hint=(0.1, 0.1),
-                    height="40"
-                )
-                self.people_functions_layout.add_widget(function_label)
-
-            edit_button = MDIconButton(
-                icon="pencil",
-                id='edit_button',
-            )
-            self.people_functions_layout.add_widget(edit_button)
-
-        # Adicione o MDGridLayout ao ScrollView
-        side_scroll.add_widget(self.people_functions_layout)
-
+                # Adicione o MDGridLayout ao ScrollView
+                side_scroll.add_widget(self.people_functions_layout)
+            except:
+                ...
         # Adicione o ScrollView ao MDCard
-        card.add_widget(side_scroll)"""
+        self.card.add_widget(side_scroll)
 
         # Adicione o MDCard à tela
         self.add_widget(self.card)
 
+
+
     # Restante do código...
 
-# Restante do código...
+    # Restante do código...
     def update_card_number(self, card_number):
         self.card_number = card_number
         print(self.card_number)
 
-        #card_screen = self.main_app.screen_manager.get_screen(self.name)
-        #card_screen.card_number = card_number
-        #card_screen.ids.card_id.card_number = card_number  # Atualiza também usando o ID do MDCard
+        # card_screen = self.main_app.screen_manager.get_screen(self.name)
+        # card_screen.card_number = card_number
+        # card_screen.ids.card_id.card_number = card_number  # Atualiza também usando o ID do MDCard
+
     def on_touch_move(self, touch):
         # Verifica se o movimento é horizontal
         if abs(touch.dx) > abs(touch.dy):
             # Desloca para a esquerda
             app = self.main_app.get_running_app()
             if touch.dx < -20:
-                #app = self.main_app.get_running_app()
+                # app = self.main_app.get_running_app()
                 screen_manager = app.screen_manager
                 next_card_number = int(self.name.split('_')[1]) + 1
                 next_card_name = f'Card_{next_card_number}'
@@ -287,7 +260,6 @@ class CardScreen(Screen):
                 if screen_manager.has_screen(next_card_name):
                     screen_manager.current = next_card_name
                     self.update_card_number(next_card_number)
-
 
                     return True
             # Desloca para a direita (pode adicionar lógica semelhante para deslocar para a tela anterior)
@@ -305,33 +277,34 @@ class CardScreen(Screen):
             app.screen_manager.transition = SlideTransition(direction='left')
             return super(CardScreen, self).on_touch_move(touch)
 
+
 class MainApp(MDApp):
+
     def build(self):
         self.my_data = MyData()
         ######  Layout  #####
         Main = MDBoxLayout()
 
+        #self.logic_instance = None
 
-        #self.logic_instance = Logic()
         self.Main_secundary = MyBoxLayout()
         self.screen_manager = ScreenManager()
 
         ##### add hearde_label #####
-        #self.theme_cls = ThemeManager()
-        #self.theme_cls.theme_style = "Light"  # Ou "Light" conforme necessário
+        self.theme_cls = ThemeManager()
+        self.theme_cls.theme_style = "Light"  # Ou "Light" conforme necessário
 
         header_label = MDLabel(
             text='Rodizio FHF 3',
             theme_text_color='Custom',
-            text_color="white",# Use 'Custom' para personalizar a cor do texto
+            text_color="white",  # Use 'Custom' para personalizar a cor do texto
             halign='right',
             bold=True,
             height=dp(10),
-            font_style= "H5",  # Estilo da fonte (pode ser "Subtitle1", "Body1", "H1", etc.)
+            font_style="H5",  # Estilo da fonte (pode ser "Subtitle1", "Body1", "H1", etc.)
             font_name="src/fontes/Lato/Lato-LightItalic.ttf",
             size_hint=(1, None),
             padding=[0, 0, 20, 0],
-
 
         )
         date_label = MDLabel(
@@ -341,20 +314,17 @@ class MainApp(MDApp):
             size_hint=(1, None),
             halign='right',
             height=dp(3),
-            padding=[0,0,20,0],
-
+            padding=[0, 0, 20, 0],
 
         )
-        self.search_field = Search(halign="center", pos_hint={"center_x": 0.4, "top":0.5})
+        self.search_field = Search(halign="center", pos_hint={"center_x": 0.5, "top": 0.5})
 
         ######## Cards ########
-
 
         # Adiciona três instâncias de telas (cada uma com um card)
         for card_number in range(1, 4):
             screen = CardScreen(self, card_number=card_number)
             self.screen_manager.add_widget(screen)
-
 
         ##### Add os cards a Main secundary e principal######
         Main.add_widget(self.search_field)
@@ -363,8 +333,14 @@ class MainApp(MDApp):
 
         self.Main_secundary.add_widget(self.screen_manager)
         Main.add_widget(self.Main_secundary)
-
+        Clock.schedule_once(lambda dt: self.on_start, 0.1)
         return Main
+
+    def on_start(self):
+
+        if not os.path.exists('dados.json'):
+            # Se não existir, instancie a classe Logic
+            self.logic_instance = Logic()
 
     """def update_people_functions_layout(self,  chave=None):
         Clock.schedule_once(lambda dt: self._update_people_functions_layout(chave), 0)
@@ -405,4 +381,3 @@ class MainApp(MDApp):
 if __name__ == '__main__':
     app = MainApp()
     app.run()
-

@@ -1,4 +1,4 @@
-
+import json
 import random
 
 from colorama import Fore
@@ -46,6 +46,9 @@ class Logic():
 
                 funcoes_disponiveis.remove(funcao)
             self.funcoes_pessoas[i] = funcoes_atribuidas
+
+        with open('dados.json', 'w') as json_file:
+            json.dump(self.funcoes_pessoas, json_file)
 
             #return funcoes_pessoas[pessoa]
 
