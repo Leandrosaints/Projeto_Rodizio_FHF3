@@ -1,6 +1,5 @@
 
 import asyncio
-import os
 import threading
 
 from kivy.uix.image import Image
@@ -285,7 +284,7 @@ class MainApp(MDApp):
         ######  Layout  #####
         Main = MDBoxLayout()
 
-        #self.logic_instance = None
+        self.logic_instance = None
 
         self.Main_secundary = MyBoxLayout()
         self.screen_manager = ScreenManager()
@@ -302,7 +301,7 @@ class MainApp(MDApp):
             bold=True,
             height=dp(10),
             font_style="H5",  # Estilo da fonte (pode ser "Subtitle1", "Body1", "H1", etc.)
-            font_name="src/fontes/Lato/Lato-LightItalic.ttf",
+            #font_name="src/fontes/Lato/Lato-LightItalic.ttf",
             size_hint=(1, None),
             padding=[0, 0, 20, 0],
 
@@ -337,10 +336,9 @@ class MainApp(MDApp):
         return Main
 
     def on_start(self):
+        print('certo')
 
-        if not os.path.exists('dados.json'):
-            # Se não existir, instancie a classe Logic
-            self.logic_instance = Logic()
+        self.logic_instance = Logic()
 
     """def update_people_functions_layout(self,  chave=None):
         Clock.schedule_once(lambda dt: self._update_people_functions_layout(chave), 0)
