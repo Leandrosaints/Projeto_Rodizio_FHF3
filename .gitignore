@@ -2,4 +2,10 @@
 __pycache__/
 builder_stats.html
 test.py
+.buildozer/
+cmdline-tools/
+commandlinetools-linux-6858069_latest.zip
+libffi/
+transferir.jpg
+venv/
 
