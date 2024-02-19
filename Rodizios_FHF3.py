@@ -1,5 +1,6 @@
-
 import asyncio
+import cProfile
+import json
 import threading
 
 from kivy.uix.image import Image
@@ -35,13 +36,12 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.clock import Clock
 
 
-
-
 # Define a largura e altura desejadas
 
 class DataDados:
     def __init__(self):
         self.dados = Logic()
+
 
 class MyData(BoxLayout):
     people_list = ListProperty(['Petrianne', 'M.Eduarda', 'Shirlene', 'Marilene', 'Alberta', 'Patricia',
@@ -163,7 +163,7 @@ class Scroll(ScrollView):
 
 
 class MyMDCard(MDCard):
-     # Exemplo de variável
+    # Exemplo de variável
     def __init__(self, card_number, **kwargs):
         super(MyMDCard, self).__init__(**kwargs)
         self.card_number = card_number
@@ -173,48 +173,84 @@ class MyMDCard(MDCard):
 
 
 class CardScreen(Screen):
-
     def __init__(self, main_app, card_number, **kwargs):
         super(CardScreen, self).__init__(name=f'Card_{card_number}', **kwargs)
         self.main_app = main_app
         self.card_number = card_number
 
-        """with self.canvas.before:
-            Color(1, 0, 0, 1)  # Cor da sombra (vermelho puro para demonstração)
-            self.shadow_rectangle = Rectangle(pos=self.pos, size=self.size)"""
-
         # Crie uma instância de MDCard
         self.card = MyMDCard(self.card_number)
 
         # Adicione um ScrollView na vertical
-        side_scroll = ScrollView(
-
+        self.side_scroll = ScrollView(
             size_hint=(None, None),
-            size=(Window.width * 0.9, Window.height * 0.8)
+            size=(Window.width * 0.8, Window.height * 0.6)
         )
 
         # Adicione o MDGridLayout ao ScrollView
         self.people_functions_layout = MDGridLayout(cols=6, size_hint_y=None, padding=(10))
         self.people_functions_layout.bind(minimum_height=self.people_functions_layout.setter('height'))
 
-        for i, nome in enumerate(main_app.my_data.people_list):
-            item = MyLabel(
-                main_app=main_app,
-                text=nome,
-                size_hint=(None, 0.1),
-                size=[100, 1],
-            )
-            self.people_functions_layout.add_widget(item)
-            try:
-                for func in main_app.logic_instance.funcoes_pessoas[i]:
-                    function_label = MyLabel(
-                        text=str(func),
-                        main_app=main_app,
-                        id='function_label',
-                        size_hint=(0.1, 0.1),
-                        height="40"
-                    )
-                    self.people_functions_layout.add_widget(function_label)
+        # Adicione o ScrollView ao MDCard
+        # self.card.add_widget(self.side_scroll)
+        # self.side_scroll.add_widget(self.people_functions_layout)
+        # Adicione o MDCard à tela
+        # self.add_widget(self.card)
+
+        # Agende a função para carregar e exibir dados após 2 segundos
+        Clock.schedule_once(lambda dt: self.load_and_display_data(), 2)
+
+    def load_and_display_data(self):
+        # Caminho para o arquivo JSON
+        json_filename = 'dados.json'
+        print('saiu na load')
+
+        # Carregar dados do arquivo JSON
+        data = self.load_data_from_json(json_filename)
+        if data:
+            #print("Dados carregados com sucesso:", data)
+            # Faça algo com os dados, como atualizar a interface do usuário
+            self.display_data_on_card(data)
+
+    def load_data_from_json(self, filename):
+        print('saiu no encontrar o file')
+        try:
+            with open(filename, 'r') as file:
+                data = json.load(file)
+                return data
+        except FileNotFoundError:
+            # print(f"Arquivo '{filename}' não encontrado.")
+            return None
+
+    def display_data_on_card(self, data):
+        # Limpar widgets antigos do layout
+        print('saiu no atualiza layout')
+        # self.people_functions_layout.clear_widgets()
+
+        try:
+            # Adicionar novos widgets com dados do JSON
+            for i, nome in enumerate(self.main_app.my_data.people_list):
+                item = MyLabel(
+                    main_app=self.main_app,
+                    text=nome,
+                    size_hint=(None, 0.1),
+                    size=[100, 1])
+
+                self.people_functions_layout.add_widget(item)
+
+                # Supondo que 'functions' seja uma lista no JSON
+                functions = data.get(str(i))
+                # print(functions)# Obtém as funções associadas ao nome
+                if functions:
+                    for func in functions:
+                        function_label = MyLabel(
+                            text=str(func),
+                            main_app=self.main_app,
+                            id='function_label',
+                            size_hint=(0.1, 0.1),
+                            height="40"
+                        )
+                        self.people_functions_layout.add_widget(function_label)
 
                 edit_button = MDIconButton(
                     icon="pencil",
@@ -222,17 +258,15 @@ class CardScreen(Screen):
                 )
                 self.people_functions_layout.add_widget(edit_button)
 
-                # Adicione o MDGridLayout ao ScrollView
-                side_scroll.add_widget(self.people_functions_layout)
-            except:
-                ...
-        # Adicione o ScrollView ao MDCard
-        self.card.add_widget(side_scroll)
+            self.side_scroll.add_widget(self.people_functions_layout)
 
-        # Adicione o MDCard à tela
-        self.add_widget(self.card)
+            self.card.add_widget(self.side_scroll)
 
+            # Adicione o MDCard à tela
+            self.add_widget(self.card)
 
+        except:
+            ...
 
     # Restante do código...
 
@@ -301,7 +335,7 @@ class MainApp(MDApp):
             bold=True,
             height=dp(10),
             font_style="H5",  # Estilo da fonte (pode ser "Subtitle1", "Body1", "H1", etc.)
-            #font_name="src/fontes/Lato/Lato-LightItalic.ttf",
+            # font_name="src/fontes/Lato/Lato-LightItalic.ttf",
             size_hint=(1, None),
             padding=[0, 0, 20, 0],
 
