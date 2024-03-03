@@ -1,13 +1,19 @@
 import asyncio
 import cProfile
 import json
+import os
 import threading
+import time
 
 from kivy.uix.image import Image
+from loading_an import Loading_animation
+from kivy.animation import Animation
+from animation_shimmer import ShimmerWidget
 from kivy.graphics import Color, Rectangle
 from kivy.metrics import dp
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import SlideTransition
+from kivy.uix.widget import Widget
 from kivymd.theming import ThemeManager
 from kivymd.uix.screen import Screen
 from kivymd.uix.screenmanager import ScreenManager
@@ -28,15 +34,46 @@ from rodizio_FHF_3 import Logic
 Builder.load_file('src/style_.kv')
 
 from kivy.properties import ListProperty, DictProperty, NumericProperty, StringProperty
-from kivy.clock import Clock
+from kivy.clock import Clock, mainthread
 from kivy.uix.boxlayout import BoxLayout
-
+# from kivymd.uix.shimmerlayout import ShimmerLayout
+from animation_shimmer import ShimmerWidget
 # from kivymd.uix.progressloader import MDProgressLoader
-
+from Load_dados import JsonFileManager
 from kivy.clock import Clock
 
+"""class ShimmerWidget(Widget):
+    def __init__(self, **kwargs):
+        super(ShimmerWidget, self).__init__(**kwargs)
+        self.duration = 1.5  # Duração total da animação
+        self.num_rectangles = 10  # Número de retângulos no shimmer
+        self.rectangles = []
+        self.create_rectangles()
+        self.start_animation()
 
-# Define a largura e altura desejadas
+    def create_rectangles(self):
+        for i in range(self.num_rectangles):
+            rectangle = Rectangle(size=(self.width / self.num_rectangles, self.height), pos=(self.width * i / self.num_rectangles, 0))
+            self.rectangles.append(rectangle)
+            self.canvas.add(Color(1, 1, 1, 0))  # Começa com opacidade 0
+            self.canvas.add(rectangle)
+
+    def start_animation(self):
+        for i, rectangle in enumerate(self.rectangles):
+            animation = Animation(pos=(self.width, 0), duration=self.duration) + \
+                        Animation(pos=(self.width * (i - 1) / self.num_rectangles, 0), duration=self.duration)
+            animation.repeat = True
+            animation.start(rectangle)
+            Clock.schedule_once(lambda dt, rect=rectangle: self.start_opacity_animation(rect), i * (self.duration / self.num_rectangles))
+
+    def start_opacity_animation(self, rectangle):
+        animation = Animation(r=0, g=0, b=0, a=0, duration=self.duration) + \
+                    Animation(r=1, g=1, b=1, a=1, duration=self.duration)
+        animation.repeat = True
+        animation.start(rectangle)
+
+# Define a largura e altura desejadas"""
+
 
 class DataDados:
     def __init__(self):
@@ -46,7 +83,6 @@ class DataDados:
 class MyData(BoxLayout):
     people_list = ListProperty(['Petrianne', 'M.Eduarda', 'Shirlene', 'Marilene', 'Alberta', 'Patricia',
                                 'Lenilza', 'Ana'])
-    funcoes = ListProperty([2, 8, 9, 12, 13, 20])
 
 
 class Dialog(MDDialog):
@@ -172,11 +208,17 @@ class MyMDCard(MDCard):
         self.size = (Window.width * 0.8, Window.height * 0.6)
 
 
+class ShimmerLayout:
+    pass
+
+
 class CardScreen(Screen):
     def __init__(self, main_app, card_number, **kwargs):
         super(CardScreen, self).__init__(name=f'Card_{card_number}', **kwargs)
         self.main_app = main_app
         self.card_number = card_number
+
+        self.json_manager = JsonFileManager('dados.json')
 
         # Crie uma instância de MDCard
         self.card = MyMDCard(self.card_number)
@@ -195,62 +237,36 @@ class CardScreen(Screen):
         # self.card.add_widget(self.side_scroll)
         # self.side_scroll.add_widget(self.people_functions_layout)
         # Adicione o MDCard à tela
-        # self.add_widget(self.card)
+        # self.add_widget()
+        self.shimmer_widget = ShimmerWidget(size=(280, 350))
 
-        # Agende a função para carregar e exibir dados após 2 segundos
-        Clock.schedule_once(lambda dt: self.load_and_display_data(), 2)
+        self.add_widget(self.shimmer_widget)
 
-    def load_and_display_data(self):
-        # Caminho para o arquivo JSON
-        json_filename = 'dados.json'
-        print('saiu na load')
+        asyncio.run(self.load_data_and_display_card())
 
-        # Carregar dados do arquivo JSON
-        data = self.load_data_from_json(json_filename)
-        if data:
-            #print("Dados carregados com sucesso:", data)
-            # Faça algo com os dados, como atualizar a interface do usuário
-            self.display_data_on_card(data)
+    async def load_data_and_display_card(self):
 
-    def load_data_from_json(self, filename):
-        print('saiu no encontrar o file')
-        try:
-            with open(filename, 'r') as file:
-                data = json.load(file)
-                return data
-        except FileNotFoundError:
-            # print(f"Arquivo '{filename}' não encontrado.")
-            return None
+        data = await self.json_manager.get_cached_data_async()
+        data_names = await self.json_manager.load_json_async()
+        # print(data_names.get('pessoas'))
 
-    def display_data_on_card(self, data):
-        # Limpar widgets antigos do layout
-        print('saiu no atualiza layout')
-        # self.people_functions_layout.clear_widgets()
+        for i, nome in enumerate(data_names.get('pessoas')):
 
-        try:
-            # Adicionar novos widgets com dados do JSON
-            for i, nome in enumerate(self.main_app.my_data.people_list):
-                item = MyLabel(
-                    main_app=self.main_app,
-                    text=nome,
-                    size_hint=(None, 0.1),
-                    size=[100, 1])
+            item = MDLabel(text=nome, size_hint=(None, 0.1), size=[100, 1])
+            self.people_functions_layout.add_widget(item)
+            functions = data.get(str(i))
 
-                self.people_functions_layout.add_widget(item)
-
-                # Supondo que 'functions' seja uma lista no JSON
-                functions = data.get(str(i))
-                # print(functions)# Obtém as funções associadas ao nome
-                if functions:
-                    for func in functions:
-                        function_label = MyLabel(
-                            text=str(func),
-                            main_app=self.main_app,
-                            id='function_label',
-                            size_hint=(0.1, 0.1),
-                            height="40"
-                        )
-                        self.people_functions_layout.add_widget(function_label)
+            if functions:
+                for func in functions:
+                    # print(func)
+                    function_label = MyLabel(
+                        text=str(func),
+                        main_app=self.main_app,
+                        id='function_label',
+                        size_hint=(0.1, 0.1),
+                        height="40"
+                    )
+                    self.people_functions_layout.add_widget(function_label)
 
                 edit_button = MDIconButton(
                     icon="pencil",
@@ -258,15 +274,10 @@ class CardScreen(Screen):
                 )
                 self.people_functions_layout.add_widget(edit_button)
 
-            self.side_scroll.add_widget(self.people_functions_layout)
+        self.side_scroll.add_widget(self.people_functions_layout)
+        self.card.add_widget(self.side_scroll)
+        self.add_widget(self.card)
 
-            self.card.add_widget(self.side_scroll)
-
-            # Adicione o MDCard à tela
-            self.add_widget(self.card)
-
-        except:
-            ...
 
     # Restante do código...
 
@@ -316,13 +327,12 @@ class MainApp(MDApp):
     def build(self):
         self.my_data = MyData()
         ######  Layout  #####
+        self.sinal = False
         Main = MDBoxLayout()
-
-        self.logic_instance = None
-
+        # self.shimmer_widget = ShimmerWidget(size=(280, 350))
         self.Main_secundary = MyBoxLayout()
         self.screen_manager = ScreenManager()
-
+        # self.Main_secundary.add_widget(self.shimmer_widget)
         ##### add hearde_label #####
         self.theme_cls = ThemeManager()
         self.theme_cls.theme_style = "Light"  # Ou "Light" conforme necessário
@@ -355,9 +365,6 @@ class MainApp(MDApp):
         ######## Cards ########
 
         # Adiciona três instâncias de telas (cada uma com um card)
-        for card_number in range(1, 4):
-            screen = CardScreen(self, card_number=card_number)
-            self.screen_manager.add_widget(screen)
 
         ##### Add os cards a Main secundary e principal######
         Main.add_widget(self.search_field)
@@ -366,13 +373,18 @@ class MainApp(MDApp):
 
         self.Main_secundary.add_widget(self.screen_manager)
         Main.add_widget(self.Main_secundary)
-        Clock.schedule_once(lambda dt: self.on_start, 0.1)
+
+        # thread = threading.Thread(target=self.delayed_loading)
+        # thread.start()
+        Clock.schedule_once(lambda dt: self.add_card_screen(), 2)
+        # thread = threading.Thread(target=self.time).start()
         return Main
 
-    def on_start(self):
-        print('certo')
+    def add_card_screen(self):
+        for card_number in range(0, 1):
+            screen = CardScreen(self, card_number=card_number)
 
-        self.logic_instance = Logic()
+            self.screen_manager.add_widget(screen)
 
     """def update_people_functions_layout(self,  chave=None):
         Clock.schedule_once(lambda dt: self._update_people_functions_layout(chave), 0)
