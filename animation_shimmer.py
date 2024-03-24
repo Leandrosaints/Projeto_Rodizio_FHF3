@@ -1,7 +1,16 @@
+<<<<<<< HEAD
 from kivy.lang import Builder
 from kivy.uix.widget import Widget
 from kivy.animation import Animation
 
+=======
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.lang import Builder
+from kivy.uix.widget import Widget
+from kivy.animation import Animation
+from kivy.clock import Clock
+>>>>>>> 8575bc846aed3ac2fec4e9f460af200822f69b45
 
 Builder.load_string('''
 <ShimmerWidget>:

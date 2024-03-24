@@ -47,7 +47,12 @@ class Logic():
                 funcoes_disponiveis.remove(funcao)
             self.funcoes_pessoas[i] = funcoes_atribuidas
 
+<<<<<<< HEAD
 
+=======
+"""with open('dadoss.json', 'w') as json_file:
+    json.dump(self.funcoes_pessoas, json_file)"""
+>>>>>>> 8575bc846aed3ac2fec4e9f460af200822f69b45
 
             #return funcoes_pessoas[pessoa]
 
