@@ -7,7 +7,7 @@
     id: root.self.id
     height: self.minimum_height
     padding: 0, 130, 0, 0
-    spacing: dp(20)
+    spacing: dp(35)
     canvas.before:
         Color:
             rgba: get_color_from_hex("#4a42ad")  # Cor de fundo do Main principal
@@ -20,8 +20,7 @@
 
 
 
-
-<MDCard>:
+<MyMDCard>:
     card_number: root.card_number
 
     orientation:'vertical'
@@ -53,8 +52,8 @@
 <MyBoxLayout>:
 
     orientation: 'vertical'
-    padding: dp(30)
-    spacing: dp(16)
+    padding: dp(10)
+    #spacing: dp(16)
     canvas.before:
         Color:
             rgba: get_color_from_hex("#f0f0f0")#cor de fundo do widget secundary
@@ -63,6 +62,53 @@
             pos: self.pos
             radius: [30, 30, 0, 0]
 
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: dp(48)
+        padding: dp(5)
+
+        #canvas.before:
+            #Color:
+                #rgba: 0.8, 0.8, 0.8, 1  # cor de fundo
+            #RoundedRectangle:
+                #size: self.size
+                #pos: self.pos
+                #radius: [20,]
+        LabelClick:
+
+            text: "FHF 1"
+            padding: dp(2)
+            halign:'center'
+            #size_hint_x: None
+            #width: self.texture_size[0] + dp(16)
+            #pos_hint: {'center_x': 0.5}
+
+
+
+        LabelClick:
+            text: "FHF 2"
+            padding: dp(2)
+            halign:'center'
+            #size_hint_x: None
+            #width: self.texture_size[0] + dp(16)
+            #pos_hint: {'center_x': 0.5}
+            #canvas.before:
+                #Color:
+                    #rgba: 0.9, 0.3, 0.6, 1  # cor de fundo
+                #RoundedRectangle:
+                    #size: self.size
+                    #pos: self.pos
+                    #radius: [20,]
+
+        LabelClick:
+
+            text: "FHF 3"
+            padding: dp(2)
+            halign:'center'
+            #size_hint_x: None
+            #width: self.texture_size[0] + dp(16)
+            #pos_hint: {'center_x': 0.5}
 
 
 
@@ -86,7 +132,7 @@
 
 <MyLabel>:
 
-    padding:10, 0, 0, 0
+    padding:4, 0, 0, 0
     size_hint:(None, None)
     canvas.before:
         Color:
@@ -95,7 +141,6 @@
             size: self.size
             pos: self.pos
             radius: [0, 0, 0, 0]
-
 
 
 

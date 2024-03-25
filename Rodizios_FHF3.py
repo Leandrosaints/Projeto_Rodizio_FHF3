@@ -68,7 +68,8 @@ from kivy.clock import Clock
 
 # Define a largura e altura desejadas"""
 
-
+class  MyMDTextField(MDTextField):
+    ...
 class Dialog(MDDialog):
     def __init__(self, text, main_app, **kwargs):
         super(Dialog, self).__init__(**kwargs)
@@ -76,14 +77,14 @@ class Dialog(MDDialog):
         # self.my_list = main_app.my_data
         self.main_app = main_app
         self.size_hint = (None, None)
-        self.size = (300, 100)
-        self.auto_dismiss = False
+        self.size = (Window.width * 0.5, Window.height * 0.5)
+        self.auto_dismiss = True
 
-        self.text_field = MDTextField(hint_text="Digite algo")
+        self.text_field = MyMDTextField(hint_text="Digite algo", size_hint=(None, None), height=100, width=400)
 
         button_layout = BoxLayout(size_hint_y=None, height="40dp", padding=("250dp", "0dp"))
         button = MDFlatButton(text="Enviar")
-        close_button = MDIconButton(icon='close-circle', on_release=self.dismiss)
+        close_button = MDIconButton(icon='close', on_release=self.dismiss)
 
         button_layout.add_widget(button)
         button_layout.add_widget(close_button)
@@ -154,7 +155,28 @@ class Dialog(MDDialog):
 
         except:
             ...
+class LabelClick(MDLabel):
+    def __init__(self, **kwargs):
+        super(LabelClick, self).__init__(**kwargs)
+        self.radius = (20, 20, 20, 20)
+        self.bind(on_touch_down=self.on_label_click)
+    """"    self.bind(on_touch_down=lambda _, touch: self.on_label_clicck(touch) if self.collide_point(*touch.pos) else False)
 
+    def on_label_clicck(self, touch):
+        CardScreen.on_touch_move(touch)
+        # Supondo que você tenha uma instância do MDLabel chamada label
+        self.md_bg_color = (0.4, 0.4, 0.4, 0.1)
+
+        #self.theme_text_color = "Secondary"""""
+
+
+    def on_label_click(self, instance, touch):
+        if self.collide_point(*touch.pos):
+            self.on_label_clicked(touch)
+
+    def on_label_clicked(self, touch):
+        self.md_bg_color = (0.4, 0.4, 0.4, 0.1)
+        self.parent.parent.on_touch_move(touch)
 
 class MyLabel(MDLabel):
     def __init__(self, main_app, **kwargs):
@@ -164,6 +186,8 @@ class MyLabel(MDLabel):
         self.bind(on_touch_down=lambda _, touch: self.on_label_click() if self.collide_point(*touch.pos) else False)
 
     def on_label_click(self):
+
+
         self.theme_text_color = "Secondary"
         self.caixa.open()
 
@@ -176,6 +200,7 @@ class MyBoxLayout(MDBoxLayout):
     ...
 
 
+    ...
 class Scroll(ScrollView):
     ...
 
@@ -189,7 +214,7 @@ class MyMDCard(MDCard):
         self.card_number = card_number
         self.var_width = Window.width
         self.var_height = Window.height
-        self.size = (Window.width * 0.8, Window.height * 0.7)
+        self.size = (Window.width * 0.9, Window.height * 0.9)
 
 
 class ShimmerLayout:
@@ -213,7 +238,7 @@ class CardScreen(Screen):
         # Adicione um ScrollView na vertical
         self.side_scroll = ScrollView(
             size_hint=(None, None),
-            size=(Window.width * 0.8, Window.height * 0.7)
+            size=(Window.width * 0.9, Window.height * 0.9)
         )
 
         # Adicione o MDGridLayout ao ScrollView
@@ -253,7 +278,7 @@ class CardScreen(Screen):
 
             for i, nome in enumerate(data_names.get('pessoas')):
 
-                item = MDLabel(text=nome, size_hint=(None, 0.1), size=[100, 1])
+                item = MDLabel(text=nome, size_hint=(None, 0.1), size=[200, 1])
                 self.people_functions_layout.add_widget(item)
                 functions = data.get(str(i))
 
@@ -270,7 +295,7 @@ class CardScreen(Screen):
                         self.people_functions_layout.add_widget(function_label)
 
                     edit_button = MDIconButton(
-                        icon="pencil",
+
                         id='edit_button',
                     )
                     self.people_functions_layout.add_widget(edit_button)
@@ -293,18 +318,21 @@ class CardScreen(Screen):
     # Restante do código...
     def update_card_number(self, card_number):
         self.card_number = card_number
-        print(self.card_number)
 
         # card_screen = self.main_app.screen_manager.get_screen(self.name)
         # card_screen.card_number = card_number
         # card_screen.ids.card_id.card_number = card_number  # Atualiza também usando o ID do MDCard
 
     def on_touch_move(self, touch):
+        print('saindo aqui')
+
         # Verifica se o movimento é horizontal
         if abs(touch.dx) > abs(touch.dy):
+
             # Desloca para a esquerda
             app = self.main_app.get_running_app()
             if touch.dx < -20:
+
                 # app = self.main_app.get_running_app()
                 screen_manager = app.screen_manager
                 next_card_number = int(self.name.split('_')[1]) + 1
@@ -317,8 +345,10 @@ class CardScreen(Screen):
                     return True
             # Desloca para a direita (pode adicionar lógica semelhante para deslocar para a tela anterior)
             elif touch.dx > 20:
+
                 prev_card_number = int(self.name.split('_')[1]) - 1
                 prev_card_name = f'Card_{prev_card_number}'
+
                 if prev_card_number >= 1 and app.screen_manager.has_screen(prev_card_name):
                     # Change the transition to SlideTransition
                     app.screen_manager.transition = SlideTransition(direction='right')
@@ -340,6 +370,7 @@ class MainApp(MDApp):
         Main = MDBoxLayout()
         # self.shimmer_widget = ShimmerWidget(size=(280, 350))
         self.Main_secundary = MyBoxLayout()
+
         self.screen_manager = ScreenManager()
         # self.Main_secundary.add_widget(self.shimmer_widget)
         ##### add hearde_label #####
